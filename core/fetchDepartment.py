@@ -3,6 +3,7 @@ from core.fetch import fetch
 from bs4 import BeautifulSoup
 import re
 import json
+import os
 
 
 def fetchClass(url):
@@ -20,6 +21,10 @@ def fetchClass(url):
 
 
 def fetchDepartment(year=109, sem=2):
+    try:
+        os.makedirs(f'./dist/{year}/{sem}/course')
+    except:
+        pass
     print(f'[fetch] 正在取得系所列表...')
     url = f'Subj.jsp?format=-2&year={year}&sem={sem}'
     url = 'https://aps.ntut.edu.tw/course/tw/'+url
@@ -39,4 +44,4 @@ def fetchDepartment(year=109, sem=2):
 
 
 if __name__ == '__main__':
-    fetchDepartments()
+    fetchDepartment()

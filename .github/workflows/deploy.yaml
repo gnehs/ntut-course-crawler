@@ -5,7 +5,7 @@ on:
     branches:
       - 蹦蹦
   schedule:
-    - cron:  '* * */1 * *'
+    - cron:  '* */12 * * *'
 
 jobs:
   build:
