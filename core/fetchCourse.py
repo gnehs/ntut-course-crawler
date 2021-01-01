@@ -4,18 +4,7 @@ import json
 import re
 import time
 import requests
-
-
-def fetch(url, i=0):
-    try:
-        return requests.get(url)
-    except:
-        print(f'[retry][{i}] {url}')
-        time.sleep(5)
-        if i < 3:
-            return fetch(url, i+1)
-        else:
-            print(f'[fetch failed] {url}')
+from fetch import fetch
 
 
 def fetchCourseDescription(url='Curr.jsp?format=-2&code=3204094'):
@@ -151,4 +140,3 @@ def fetchCourse(year=109, sem=2, keyword=''):
 
 if __name__ == '__main__':
     fetchCourse()
-    # print(fetchSyllabus())
