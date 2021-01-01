@@ -1,5 +1,5 @@
 
-from fetch import fetch
+from core.fetch import fetch
 from bs4 import BeautifulSoup
 import re
 import json

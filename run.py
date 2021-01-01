@@ -1,5 +1,7 @@
 
-from core.main import main
+from core.fetchDepartment import fetchDepartment
+from core.fetchCourse import fetchCourse
 
 if __name__ == '__main__':
-    main()
+    fetchDepartment()
+    fetchCourse()

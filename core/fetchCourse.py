@@ -4,7 +4,7 @@ import json
 import re
 import time
 import requests
-from fetch import fetch
+from core.fetch import fetch
 
 
 def fetchCourseDescription(url='Curr.jsp?format=-2&code=3204094'):
