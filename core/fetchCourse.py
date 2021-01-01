@@ -2,7 +2,6 @@ from bs4 import BeautifulSoup
 import os
 import json
 import re
-import time
 import requests
 from core.fetch import fetch
 
@@ -131,7 +130,6 @@ def fetchCourse(year=109, sem=2, keyword=''):
             'language': rowData[19].text.replace('\n', ''),
             'notes': rowData[21].text.replace('\n', ''),
         })
-        time.sleep(.1)  # 我是好寶寶
 
     with open(f'./dist/{year}/{sem}/main.json', 'w') as outfile:
         json.dump(table_data, outfile)
