@@ -4,5 +4,9 @@ from fetchCourse import fetchCourse
 
 def main():
     print('正在擷取資料...')
-    fetchCourse()
     fetchDepartment()
+    fetchCourse()
+
+
+if __name__ == '__main__':
+    main()

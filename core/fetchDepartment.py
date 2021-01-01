@@ -19,7 +19,7 @@ def fetchClass(url):
     return res
 
 
-def fetchAllClass(year=109, sem=2):
+def fetchDepartment(year=109, sem=2):
     print(f'[fetch] 正在取得系所列表...')
     url = f'Subj.jsp?format=-2&year={year}&sem={sem}'
     url = 'https://aps.ntut.edu.tw/course/tw/'+url
@@ -39,4 +39,4 @@ def fetchAllClass(year=109, sem=2):
 
 
 if __name__ == '__main__':
-    fetchAllClass()
+    fetchDepartments()
