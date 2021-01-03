@@ -1,5 +1,6 @@
 from core.fetch import fetch
 from bs4 import BeautifulSoup
+import os
 import json
 
 
@@ -15,6 +16,10 @@ def fetchAllYearSem():
             yrRes[i] = [1, 2]
         else:
             yrRes[i] = [1]
+    try:
+        os.makedirs(f'./dist/')
+    except:
+        pass
     with open(f'./dist/main.json', 'w') as outfile:
         json.dump(yrRes, outfile)
     return yrRes
