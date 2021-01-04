@@ -7,7 +7,24 @@ on:
   schedule:
     - cron:  '* * 1 * *'
 
-jobs: 
+jobs:
+  fetchYears:
+    runs-on: ubuntu-latest 
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip 
+        pip install -r requirements.txt
+    - name: Fetch Years
+      id: set-matrix
+      run: python fetchYears.py 
 
   fetchYearData:
     needs: fetchYears
