@@ -25,14 +25,12 @@ jobs:
     - name: Fetch Years
       id: set-matrix
       run: python fetchYears.py 
-
   fetchYearData:
     needs: fetchYears
     runs-on: ubuntu-latest 
     if: ${{ always() }}
     strategy:
-      matrix: 
-        years: ['109','105']
+      matrix: ${{fromJson(needs.fetchYears.outputs.matrix)}}
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python
@@ -43,24 +41,24 @@ jobs:
       run: |
         python -m pip install --upgrade pip 
         pip install -r requirements.txt
-    - name: Fetch ${{ matrix.years }} data
+    - name: Fetch data (${{ matrix.years }})
       run: python runYear.py ${{ matrix.years }}
-    - name: Deploy to GitHub Pages
-      uses: peaceiris/actions-gh-pages@v3
+    - uses: actions/upload-artifact@v2
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: dist 
-        keep_files: true
+        name: ${{ matrix.years }}
+        path: ./dist/${{ matrix.years }}/
+        retention-days: 2
   addMainJson:
     needs: fetchYearData
     runs-on: ubuntu-latest 
     steps:
     - uses: actions/checkout@v2
-    - name: Checkout gh-pages branch
-      uses: actions/checkout@v2
-      with:
-        ref: gh-pages
-        path: dist
+    - uses: actions/download-artifact@v2
+      with: 
+        path: ./dist/
+    - name: Show All years
+      run: ls -R
+      working-directory: ./dist/
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
