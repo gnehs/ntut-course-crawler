@@ -1,5 +1,6 @@
 from os import listdir
-from os.path import isfile, join, isdir
+from os.path import join, isdir
+import json
 distPath = './dist'
 yearFolders = [f for f in listdir(distPath) if isdir(join(distPath, f))]
 result = {}
