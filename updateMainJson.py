@@ -3,6 +3,10 @@ from os.path import join, isdir
 import json
 distPath = './dist'
 yearFolders = [f for f in listdir(distPath) if isdir(join(distPath, f))]
+try:
+    yearFolders.remove(".git")
+except:
+    pass
 result = {}
 for year in yearFolders:
     result[year] = [f for f in listdir(join(
