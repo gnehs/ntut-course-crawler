@@ -6,7 +6,7 @@ import requests
 from core.fetch import fetch
 
 
-def fetchCourseDescription(url='Curr.jsp?format=-2&code=3204094'):
+def fetchCourseDescription(url='Curr.jsp?format=-2&code=1419976'):
     url = 'https://aps.ntut.edu.tw/course/tw/'+url
     result = fetch(url)
     soup = BeautifulSoup(result.text, 'lxml')('tr')
@@ -72,64 +72,67 @@ def fetchCourse(year=109, sem=2, keyword=''):
     table_data = []
     print(f'[fetch] 開始擷取 {len(soup)} 堂課')
     for row in soup:
-        def parseLinks(d):
-            res = []
-            for i in d:
-                res.append({
-                    'name': i.text,
-                    'link': i.get('href'),
-                    'code':  re.findall(r'code=(.+)', i.get('href'))[0]
-                })
-            return res
-        rowData = row("td")
-        courseId = rowData[0].text.replace('\n', '')
-        courseName = rowData[1].text.replace('\n', '')
-        print(f'[fetch] {courseId}|{courseName}')
-        # fetch description
-        courseCode, courseNameEng, courseDescription, courseDescriptionEng = fetchCourseDescription(
-            rowData[1]('a')[0].get('href'))
-        # fetch syllabus
+        try:
+            def parseLinks(d):
+                res = []
+                for i in d:
+                    res.append({
+                        'name': i.text,
+                        'link': i.get('href'),
+                        'code':  re.findall(r'code=(.+)', i.get('href'))[0]
+                    })
+                return res
+            rowData = row("td")
+            courseId = rowData[0].text.replace('\n', '')
+            courseName = rowData[1].text.replace('\n', '')
+            print(f'[fetch] {courseId}|{courseName}')
+            # fetch description
+            courseCode, courseNameEng, courseDescription, courseDescriptionEng = fetchCourseDescription(
+                rowData[1]('a')[0].get('href'))
+            # fetch syllabus
 
-        def parseSyllabus(d):
-            syllabusData = []
-            for i in d:
-                syllabusData.append(fetchSyllabus(i.get('href')))
-            with open(f'./dist/{year}/{sem}/course/{courseId}.json', 'w') as outfile:
-                json.dump(syllabusData, outfile)
-        parseSyllabus(rowData[20]('a')),
-        table_data.append({
-            'id': courseId,
-            'code': courseCode,
-            'name': {
-                'zh': courseName,
-                'en': courseNameEng
-            },
-            'description': {
-                'zh': courseDescription,
-                'en': courseDescriptionEng
-            },
-            'stage': rowData[2].text.replace('\n', ''),
-            'credit': rowData[3].text.replace('\n', ''),
-            'hours': rowData[4].text.replace('\n', ''),
-            'courseType': rowData[5].text.replace('\n', ''),
-            'class': parseLinks(rowData[6]('a')),
-            'teacher': parseLinks(rowData[7]('a')),
-            'time': {
-                'sun': rowData[8].text.split(),
-                'mon': rowData[9].text.split(),
-                'tue': rowData[10].text.split(),
-                'wed': rowData[11].text.split(),
-                'thu': rowData[12].text.split(),
-                'fri': rowData[13].text.split(),
-                'sat': rowData[14].text.split(),
-            },
-            'classroom': parseLinks(rowData[15]('a')),
-            'people': rowData[16].text.replace('\n', ''),
-            'peopleWithdraw': rowData[17].text.replace('\n', ''),
-            'ta': parseLinks(rowData[18]('a')),
-            'language': rowData[19].text.replace('\n', ''),
-            'notes': rowData[21].text.replace('\n', ''),
-        })
+            def parseSyllabus(d):
+                syllabusData = []
+                for i in d:
+                    syllabusData.append(fetchSyllabus(i.get('href')))
+                with open(f'./dist/{year}/{sem}/course/{courseId}.json', 'w') as outfile:
+                    json.dump(syllabusData, outfile)
+            parseSyllabus(rowData[20]('a')),
+            table_data.append({
+                'id': courseId,
+                'code': courseCode,
+                'name': {
+                    'zh': courseName,
+                    'en': courseNameEng
+                },
+                'description': {
+                    'zh': courseDescription,
+                    'en': courseDescriptionEng
+                },
+                'stage': rowData[2].text.replace('\n', ''),
+                'credit': rowData[3].text.replace('\n', ''),
+                'hours': rowData[4].text.replace('\n', ''),
+                'courseType': rowData[5].text.replace('\n', ''),
+                'class': parseLinks(rowData[6]('a')),
+                'teacher': parseLinks(rowData[7]('a')),
+                'time': {
+                    'sun': rowData[8].text.split(),
+                    'mon': rowData[9].text.split(),
+                    'tue': rowData[10].text.split(),
+                    'wed': rowData[11].text.split(),
+                    'thu': rowData[12].text.split(),
+                    'fri': rowData[13].text.split(),
+                    'sat': rowData[14].text.split(),
+                },
+                'classroom': parseLinks(rowData[15]('a')),
+                'people': rowData[16].text.replace('\n', ''),
+                'peopleWithdraw': rowData[17].text.replace('\n', ''),
+                'ta': parseLinks(rowData[18]('a')),
+                'language': rowData[19].text.replace('\n', ''),
+                'notes': rowData[21].text.replace('\n', ''),
+            })
+        except:
+            pass
 
     with open(f'./dist/{year}/{sem}/main.json', 'w') as outfile:
         json.dump(table_data, outfile)

@@ -1,6 +1,9 @@
 name: fetchAll 
 
 on:
+  push:
+    branches:
+      - 蹦蹦
   schedule:
     - cron:  '* * 1 * *'
 
