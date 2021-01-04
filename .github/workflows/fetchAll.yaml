@@ -1,4 +1,4 @@
-name: fetchAll 
+name: fetchAll
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
 
 jobs:
   fetchYears:
-    runs-on: ubuntu-latest 
+    runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
@@ -20,15 +20,14 @@ jobs:
         python-version: '3.x'
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip 
+        python -m pip install --upgrade pip
         pip install -r requirements.txt
     - name: Fetch Years
       id: set-matrix
-      run: python fetchYears.py 
+      run: python fetchYears.py
   fetchYearData:
     needs: fetchYears
-    runs-on: ubuntu-latest 
-    if: ${{ always() }}
+    runs-on: ubuntu-latest
     strategy:
       matrix: ${{fromJson(needs.fetchYears.outputs.matrix)}}
     steps:
@@ -39,7 +38,7 @@ jobs:
         python-version: '3.x'
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip 
+        python -m pip install --upgrade pip
         pip install -r requirements.txt
     - name: Fetch data (${{ matrix.years }})
       run: python runYear.py ${{ matrix.years }}
@@ -50,11 +49,11 @@ jobs:
         retention-days: 2
   addMainJson:
     needs: fetchYearData
-    runs-on: ubuntu-latest 
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
     - uses: actions/download-artifact@v2
-      with: 
+      with:
         path: ./dist/
     - name: Show All years
       run: ls -R
@@ -62,12 +61,12 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
-        python-version: '3.x' 
+        python-version: '3.x'
     - name: Update main.json
       run: python updateMainJson.py
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: dist 
+        publish_dir: dist
         keep_files: true
