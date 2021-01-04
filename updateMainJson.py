@@ -7,6 +7,7 @@ try:
     yearFolders.remove(".git")
 except:
     pass
+yearFolders.sort()
 result = {}
 for year in yearFolders:
     result[year] = [f for f in listdir(join(
