@@ -31,7 +31,8 @@ jobs:
     runs-on: ubuntu-latest 
     if: ${{ always() }}
     strategy:
-      matrix: ['109','105']
+      matrix: 
+        years: ['109','105']
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python
