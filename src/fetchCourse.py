@@ -3,7 +3,10 @@ import os
 import json
 import re
 import requests
-from core.fetch import fetch
+if __name__ == '__main__':
+    from fetchUrl import fetch
+else:
+    from .fetchUrl import fetch
 
 
 def fetchCourseDescription(url='Curr.jsp?format=-2&code=1419976'):

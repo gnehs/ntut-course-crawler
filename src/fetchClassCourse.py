@@ -1,5 +1,8 @@
 
-from core.fetch import fetch
+if __name__ == '__main__':
+    from fetchUrl import fetch
+else:
+    from .fetchUrl import fetch
 from bs4 import BeautifulSoup
 import re
 import json

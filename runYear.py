@@ -1,6 +1,6 @@
 
-from core.fetchDepartment import fetchDepartment
-from core.fetchCourse import fetchCourse
+from src.fetchClassCourse import fetchDepartment
+from src.fetchCourse import fetchCourse
 import sys
 if __name__ == '__main__':
     if len(sys.argv) < 2:
