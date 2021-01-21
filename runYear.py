@@ -1,15 +1,13 @@
-
-from src.fetchClassCourse import fetchDepartment
+import asyncio
+from src.fetchClassCourse import fetchDepartmentData
 from src.fetchCourse import fetchCourse
 import sys
 if __name__ == '__main__':
-    if len(sys.argv) < 5:
+    if len(sys.argv) < 2:
         print('no argument')
         sys.exit()
     yr = sys.argv[1]
-    sem = sys.argv[2]
-    dpmName = sys.argv[3]
-    dpm = sys.argv[4]
-    print(f'[fetch] Year:{yr} Sem:{sem} Department: {dpmName}')
-    fetchDepartment(yr, sem)
-    fetchCourse(yr, sem, '', dpm)
+    for sem in range(1, 2+1):
+        print(f'[fetch] Year:{yr} Sem:{sem}')
+        asyncio.run(fetchDepartmentData(yr, sem))
+        asyncio.run(fetchCourse(yr, sem))

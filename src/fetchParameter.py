@@ -1,7 +1,9 @@
+
+
 if __name__ == '__main__':
-    from fetchUrl import fetch
+    from fetchUrl.fetchUrl import fetch
 else:
-    from .fetchUrl import fetch
+    from .fetchUrl.fetchUrl import fetch
 
 from bs4 import BeautifulSoup
 
@@ -23,6 +25,7 @@ def fetchDepartment():
     res = {}
     for item in yr:
         res[item.text] = item.get('value')
+    res.pop('全校')
     return res
 
 
@@ -32,12 +35,8 @@ def fetchAllYear():
     yr = soup.find("select", {"name": "year"})('option')
     res = {'years': []}
 
-    departmentData = fetchDepartment()
-    departmentData.pop('全校')
     for item in yr:
-        for key in departmentData:
-            res['years'].append(f"{item.text} 1 '{key}' {departmentData[key]}")
-            res['years'].append(f"{item.text} 2 '{key}' {departmentData[key]}")
+        res['years'].append(item.text)
     print('::set-output name=matrix::', res)
 
 

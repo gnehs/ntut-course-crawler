@@ -1,12 +1,13 @@
 
 if __name__ == '__main__':
-    from fetchUrl import fetch
+    from fetchUrl.fetchUrl import fetch
 else:
-    from .fetchUrl import fetch
+    from .fetchUrl.fetchUrl import fetch
 from bs4 import BeautifulSoup
 import re
 import json
 import os
+import asyncio
 
 
 def fetchClass(url):
@@ -14,16 +15,27 @@ def fetchClass(url):
     departmentData = fetch(url)
 
     soup = BeautifulSoup(departmentData.text, 'lxml')
-    res = []
+    r = []
     for item in soup.findAll('a', href=re.compile(r'^Subj.jsp?')):
-        res.append({
+        r.append({
             'name': item.text,
             'href': item.get('href')
         })
-    return res
+    return r
 
 
-def fetchDepartment(year=109, sem=2):
+async def appendData(department):
+    print(f'get {department.text}')
+    res.append({
+        'name': department.text,
+        'href': department.get('href'),
+        'class': fetchClass(department.get('href'))
+    })
+
+res = []
+
+
+async def fetchDepartmentData(year=109, sem=2):
     try:
         os.makedirs(f'./dist/{year}/{sem}/course')
     except:
@@ -34,17 +46,16 @@ def fetchDepartment(year=109, sem=2):
     departmentsData = fetch(url)
 
     soup = BeautifulSoup(departmentsData.text, 'lxml')
-    res = []
+
+    taskPool = []
     for department in soup.findAll('a', href=re.compile(r'^Subj.jsp?')):
-        res.append({
-            'name': department.text,
-            'href': department.get('href'),
-            'class': fetchClass(department.get('href'))
-        })
+        taskPool.append(appendData(department))
+
+    await asyncio.gather(*taskPool)
 
     with open(f'./dist/{year}/{sem}/department.json', 'w') as outfile:
         json.dump(res, outfile)
 
 
 if __name__ == '__main__':
-    fetchDepartment()
+    asyncio.run(fetchDepartmentData())

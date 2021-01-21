@@ -1,13 +1,9 @@
-
-from src.fetchClassCourse import fetchDepartment
+import asyncio
+from src.fetchClassCourse import fetchDepartmentData
 from src.fetchCourse import fetchCourse
 from src.fetchParameter import fetchCurrentYearSem
-from src.fetchParameter import fetchDepartment
 if __name__ == '__main__':
-    departmentData = fetchDepartment()
-    departmentData.pop('全校')
-
     yr, sem = fetchCurrentYearSem()
-    fetchDepartment(yr, sem)
-    for key in departmentData:
-        fetchCourse(yr, sem, '', departmentData[key])
+    print(f'[fetch] Year:{yr} Sem:{sem}')
+    asyncio.run(fetchDepartmentData(yr, sem))
+    asyncio.run(fetchCourse(yr, sem))
