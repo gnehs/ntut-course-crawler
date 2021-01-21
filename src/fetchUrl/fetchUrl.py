@@ -6,11 +6,12 @@ from fake_useragent import UserAgent
 
 
 async def fetch(url, i=0):
+    sem = asyncio.Semaphore(10)
     headers = {
         'User-Agent': UserAgent().random
     }
     try:
-        async with aiohttp.ClientSession() as session:
+        async with sem, aiohttp.ClientSession() as session:
             async with session.get(url, headers=headers, timeout=60 * 60 * 24) as response:
                 r = await response.read()
                 return r.decode('big5-hkscs')
@@ -18,7 +19,7 @@ async def fetch(url, i=0):
         print(f'[retry][{i}] {url}')
         time.sleep(5)
         if i < 3:
-            async with aiohttp.ClientSession() as session:
+            async with sem, aiohttp.ClientSession() as session:
                 async with session.get(url, headers=headers, timeout=60 * 60 * 24) as response:
                     r = await response.read()
                     return r.decode('big5-hkscs')

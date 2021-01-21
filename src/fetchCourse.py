@@ -115,15 +115,6 @@ async def courseWorker(row, year, sem):
         pass
 
 
-async def gather_with_concurrency(n, *tasks):
-    semaphore = asyncio.Semaphore(n)
-
-    async def sem_task(task):
-        async with semaphore:
-            return await task
-    return await asyncio.gather(*(sem_task(task) for task in tasks))
-
-
 async def fetchCourse(year=109, sem=2, keyword=''):
     try:
         os.makedirs(f'./dist/{year}/{sem}/course')
@@ -161,9 +152,9 @@ async def fetchCourse(year=109, sem=2, keyword=''):
         print(f'[fetch] 開始擷取 {len(soup)} 堂課')
 
         tasksPool = []
-        for i in range(len(soup)):
-            tasksPool.append(courseWorker(soup[i], year, sem))
-        await gather_with_concurrency(10, *tasksPool)
+        for i in soup:
+            tasksPool.append(courseWorker(i, year, sem))
+        await asyncio.gather(*tasksPool)
 
         filename = 'main' if key == '日間部四技' else key
         with open(f'./dist/{year}/{sem}/{filename}.json', 'w') as outfile:
