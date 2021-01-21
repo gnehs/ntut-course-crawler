@@ -162,7 +162,7 @@ async def fetchCourse(year=109, sem=2, keyword=''):
 
         tasksPool = []
         for i in range(len(soup)):
-            tasksPool.append(courseWorker(soup[i], year, sem, i))
+            tasksPool.append(courseWorker(soup[i], year, sem))
         await gather_with_concurrency(10, *tasksPool)
 
         filename = 'main' if key == '日間部四技' else key
