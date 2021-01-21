@@ -1,3 +1,3 @@
-from src.fetchYearSem import fetchAllYear
+from src.fetchParameter import fetchAllYear
 if __name__ == '__main__':
     fetchAllYear()
