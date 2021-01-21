@@ -12,7 +12,8 @@ def fetchAllYear():
     yr = soup.find("select", {"name": "year"})('option')
     res = {'years': []}
     for item in yr:
-        res['years'].append(item.text)
+        res['years'].append(f'{item.text} 1')
+        res['years'].append(f'{item.text} 2')
     print('::set-output name=matrix::', res)
 
 
