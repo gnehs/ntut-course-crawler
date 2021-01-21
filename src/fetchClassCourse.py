@@ -34,6 +34,15 @@ async def appendData(department):
 res = []
 
 
+async def gather_with_concurrency(n, *tasks):
+    semaphore = asyncio.Semaphore(n)
+
+    async def sem_task(task):
+        async with semaphore:
+            return await task
+    return await asyncio.gather(*(sem_task(task) for task in tasks))
+
+
 async def fetchDepartmentData(year=109, sem=2):
     try:
         os.makedirs(f'./dist/{year}/{sem}/course')
@@ -46,11 +55,9 @@ async def fetchDepartmentData(year=109, sem=2):
 
     soup = BeautifulSoup(departmentsData, 'lxml')
 
-    taskPool = []
-    for department in soup.findAll('a', href=re.compile(r'^Subj.jsp?')):
-        taskPool.append(appendData(department))
-
-    await asyncio.gather(*taskPool)
+    tasksList = [appendData(i) for i in soup.findAll(
+        'a', href=re.compile(r'^Subj.jsp?'))]
+    await gather_with_concurrency(5, *tasksList)
 
     with open(f'./dist/{year}/{sem}/department.json', 'w') as outfile:
         json.dump(res, outfile)

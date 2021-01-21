@@ -49,7 +49,7 @@ async def fetchSyllabus(url='ShowSyllabus.jsp?snum=281841&code=11189'):
             r'使用外文原文書：(.)', soup[6]('td')[0].text)[0] == '是')
 
 
-async def courseWorker(row, year, sem, i):
+async def courseWorker(row, year, sem):
     try:
         def parseLinks(d):
             res = []
@@ -115,6 +115,15 @@ async def courseWorker(row, year, sem, i):
         pass
 
 
+async def gather_with_concurrency(n, *tasks):
+    semaphore = asyncio.Semaphore(n)
+
+    async def sem_task(task):
+        async with semaphore:
+            return await task
+    return await asyncio.gather(*(sem_task(task) for task in tasks))
+
+
 async def fetchCourse(year=109, sem=2, keyword=''):
     try:
         os.makedirs(f'./dist/{year}/{sem}/course')
@@ -154,7 +163,7 @@ async def fetchCourse(year=109, sem=2, keyword=''):
         tasksPool = []
         for i in range(len(soup)):
             tasksPool.append(courseWorker(soup[i], year, sem, i))
-        await asyncio.gather(*tasksPool)
+        await gather_with_concurrency(10, *tasksPool)
 
         filename = 'main' if key == '日間部四技' else key
         with open(f'./dist/{year}/{sem}/{filename}.json', 'w') as outfile:

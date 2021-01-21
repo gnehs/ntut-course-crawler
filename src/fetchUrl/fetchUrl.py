@@ -2,12 +2,16 @@
 import time
 import aiohttp
 import asyncio
+from fake_useragent import UserAgent
 
 
 async def fetch(url, i=0):
+    headers = {
+        'User-Agent': UserAgent().random
+    }
     try:
         async with aiohttp.ClientSession() as session:
-            async with session.get(url, timeout=30) as response:
+            async with session.get(url, headers=headers, timeout=60 * 60 * 24) as response:
                 r = await response.read()
                 return r.decode('big5-hkscs')
     except:
@@ -15,7 +19,7 @@ async def fetch(url, i=0):
         time.sleep(5)
         if i < 3:
             async with aiohttp.ClientSession() as session:
-                async with session.get(url, timeout=30) as response:
+                async with session.get(url, headers=headers, timeout=60 * 60 * 24) as response:
                     r = await response.read()
                     return r.decode('big5-hkscs')
         else:
