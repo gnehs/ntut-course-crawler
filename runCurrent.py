@@ -2,8 +2,12 @@ import asyncio
 from src.fetchClassCourse import fetchDepartmentData
 from src.fetchCourse import fetchCourse
 from src.fetchParameter import fetchCurrentYearSem
-if __name__ == '__main__':
-    yr, sem = fetchCurrentYearSem()
+
+
+async def main():
+    yr, sem = await fetchCurrentYearSem()
     print(f'[fetch] Year:{yr} Sem:{sem}')
-    asyncio.run(fetchDepartmentData(yr, sem))
-    asyncio.run(fetchCourse(yr, sem))
+    await fetchDepartmentData(yr, sem)
+    await fetchCourse(yr, sem)
+if __name__ == '__main__':
+    asyncio.run(main())

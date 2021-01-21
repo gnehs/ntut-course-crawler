@@ -18,10 +18,10 @@ else:
 table_data = []
 
 
-def fetchCourseDescription(url='Curr.jsp?format=-2&code=1419976'):
+async def fetchCourseDescription(url='Curr.jsp?format=-2&code=1419976'):
     url = 'https://aps.ntut.edu.tw/course/tw/'+url
-    result = fetch(url)
-    soup = BeautifulSoup(result.text, 'lxml')('tr')
+    result = await fetch(url)
+    soup = BeautifulSoup(result, 'lxml')('tr')
     soup.pop(0)
     courseCode = soup[0]('td')[0].text.replace('\n', '').strip()
     courseNameEng = soup[0]('td')[2].text.replace('\n', '').strip()
@@ -30,10 +30,10 @@ def fetchCourseDescription(url='Curr.jsp?format=-2&code=1419976'):
     return courseCode, courseNameEng, courseDescription, courseDescriptionEng
 
 
-def fetchSyllabus(url='ShowSyllabus.jsp?snum=281841&code=11189'):
+async def fetchSyllabus(url='ShowSyllabus.jsp?snum=281841&code=11189'):
     url = 'https://aps.ntut.edu.tw/course/tw/'+url
-    result = fetch(url)
-    soup = BeautifulSoup(result.text, 'lxml')('tr')
+    result = await fetch(url)
+    soup = BeautifulSoup(result, 'lxml')('tr')
     soup.pop(0)
     soup.pop(0)
     return dict(
@@ -49,7 +49,7 @@ def fetchSyllabus(url='ShowSyllabus.jsp?snum=281841&code=11189'):
             r'使用外文原文書：(.)', soup[6]('td')[0].text)[0] == '是')
 
 
-async def worker(row, year, sem, i):
+async def courseWorker(row, year, sem, i):
     try:
         def parseLinks(d):
             res = []
@@ -64,20 +64,20 @@ async def worker(row, year, sem, i):
         courseId = rowData[0].text.replace('\n', '')
         courseName = rowData[1].text.replace('\n', '')
         # fetch description
-        courseCode, courseNameEng, courseDescription, courseDescriptionEng = fetchCourseDescription(
+        courseCode, courseNameEng, courseDescription, courseDescriptionEng = await fetchCourseDescription(
             rowData[1]('a')[0].get('href'))
 
         # fetch syllabus
-        def parseSyllabus(d):
+        async def parseSyllabus(d):
             filepath = f'./dist/{year}/{sem}/course/{courseId}.json'
             if not path.exists(filepath):
                 syllabusData = []
                 for i in d:
-                    syllabusData.append(fetchSyllabus(i.get('href')))
+                    syllabusData.append(await fetchSyllabus(i.get('href')))
                 with open(filepath, 'w') as outfile:
                     json.dump(syllabusData, outfile)
 
-        parseSyllabus(rowData[20]('a'))
+        await parseSyllabus(rowData[20]('a'))
         table_data.append({
             'id': courseId,
             'code': courseCode,
@@ -120,7 +120,7 @@ async def fetchCourse(year=109, sem=2, keyword=''):
         os.makedirs(f'./dist/{year}/{sem}/course')
     except:
         pass
-    departmentData = fetchDepartment()
+    departmentData = await fetchDepartment()
     for key in departmentData:
         payload = {
             'stime': '0',
@@ -141,7 +141,7 @@ async def fetchCourse(year=109, sem=2, keyword=''):
         print(f'[fetch] 請求課程列表：{key}')
         result = requests.post(
             'https://aps.ntut.edu.tw/course/tw/QueryCourse.jsp', data=payload)
-        result.encoding = 'cp950'
+        result.encoding = 'big5-hkscs'
         # 以 Beautiful Soup 解析 HTML 程式碼
         soup = BeautifulSoup(result.text, 'lxml')("tr")
         # remove useless data
@@ -153,7 +153,7 @@ async def fetchCourse(year=109, sem=2, keyword=''):
 
         tasksPool = []
         for i in range(len(soup)):
-            tasksPool.append(worker(soup[i], year, sem, i))
+            tasksPool.append(courseWorker(soup[i], year, sem, i))
         await asyncio.gather(*tasksPool)
 
         filename = 'main' if key == '日間部四技' else key

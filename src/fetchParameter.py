@@ -1,5 +1,4 @@
-
-
+import asyncio
 if __name__ == '__main__':
     from fetchUrl.fetchUrl import fetch
 else:
@@ -8,9 +7,9 @@ else:
 from bs4 import BeautifulSoup
 
 
-def fetchCurrentYearSem():
-    res = fetch('https://aps.ntut.edu.tw/course/tw/QueryCurrPage.jsp')
-    soup = BeautifulSoup(res.text, 'lxml')
+async def fetchCurrentYearSem():
+    res = await fetch('https://aps.ntut.edu.tw/course/tw/QueryCurrPage.jsp')
+    soup = BeautifulSoup(res, 'lxml')
     yr = int(soup.find("select", {"name": "year"}).find(
         "option", {"selected": ""}).text)
     sem = int(soup.find("select", {"name": "sem"}).find(
@@ -18,9 +17,9 @@ def fetchCurrentYearSem():
     return yr, sem
 
 
-def fetchDepartment():
-    res = fetch('https://aps.ntut.edu.tw/course/tw/QueryCurrPage.jsp')
-    soup = BeautifulSoup(res.text, 'lxml')
+async def fetchDepartment():
+    res = await fetch('https://aps.ntut.edu.tw/course/tw/QueryCurrPage.jsp')
+    soup = BeautifulSoup(res, 'lxml')
     yr = soup.find("select", {"name": "matric"})('option')
     res = {}
     for item in yr:
@@ -29,9 +28,9 @@ def fetchDepartment():
     return res
 
 
-def fetchAllYear():
-    res = fetch('https://aps.ntut.edu.tw/course/tw/QueryCurrPage.jsp')
-    soup = BeautifulSoup(res.text, 'lxml')
+async def fetchAllYear():
+    res = await fetch('https://aps.ntut.edu.tw/course/tw/QueryCurrPage.jsp')
+    soup = BeautifulSoup(res, 'lxml')
     yr = soup.find("select", {"name": "year"})('option')
     res = {'years': []}
 
@@ -41,4 +40,6 @@ def fetchAllYear():
 
 
 if __name__ == '__main__':
-    print(fetchAllYear())
+    async def main():
+        await fetchAllYear()
+    asyncio.run(main())
