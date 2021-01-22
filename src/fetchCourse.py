@@ -51,7 +51,7 @@ async def fetchSyllabus(url='ShowSyllabus.jsp?snum=281841&code=11189'):
 
 
 async def courseWorker(row, year, sem):
-    await asyncio.sleep(random.randint(1, 10))
+    await asyncio.sleep(random.randint(1, 60*5))
     try:
         def parseLinks(d):
             res = []

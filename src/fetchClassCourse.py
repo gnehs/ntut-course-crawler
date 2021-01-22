@@ -25,7 +25,7 @@ async def fetchClass(url):
 
 
 async def appendData(department):
-    await asyncio.sleep(random.randint(1, 10))
+    await asyncio.sleep(random.randint(1, 20))
     res.append({
         'name': department.text,
         'href': department.get('href'),
