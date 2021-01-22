@@ -5,6 +5,7 @@ import json
 import re
 import requests
 import random
+import time
 from os import path
 
 if __name__ == '__main__':
@@ -50,6 +51,21 @@ async def fetchSyllabus(url='ShowSyllabus.jsp?snum=281841&code=11189'):
             r'使用外文原文書：(.)', soup[6]('td')[0].text)[0] == '是')
 
 
+def post(url, payload, i=0):
+    try:
+        result = requests.post(
+            'https://aps.ntut.edu.tw/course/tw/QueryCourse.jsp', data=payload)
+        result.encoding = 'big5-hkscs'
+        return result.text
+    except:
+        print(f'[retry post][{i}] {url}')
+        time.sleep(5)
+        if i < 3:
+            return post(url, payload, i+1)
+        else:
+            print(f'[post failed] {url}')
+
+
 async def courseWorker(row, year, sem):
     await asyncio.sleep(random.randint(1, 60*5))
     try:
@@ -65,6 +81,8 @@ async def courseWorker(row, year, sem):
         rowData = row("td")
         courseId = rowData[0].text.replace('\n', '')
         courseName = rowData[1].text.replace('\n', '')
+
+        print(f'[fetch][{courseId}]{courseName}')
         # fetch description
         courseCode, courseNameEng, courseDescription, courseDescriptionEng = await fetchCourseDescription(
             rowData[1]('a')[0].get('href'))
@@ -117,11 +135,52 @@ async def courseWorker(row, year, sem):
         pass
 
 
+async def fetchAllCourse(year=109, sem=2, keyword=''):
+    payload = {
+        'stime': '0',
+        'year': year,
+        'matric': "'0','1','4','5','6','7','8','9','A','C','D','E','F'",
+        'sem': sem,
+        'unit': '**',
+        'cname': keyword.encode('cp950'),
+        'ccode': '',
+        'tname': '',
+        'PN': 'ON',
+    }
+    for i in range(6+1):
+        payload['D'+str(i)] = 'ON'
+    for i in range(13+1):
+        payload['P'+str(i)] = 'ON'
+
+    print(f'[fetch] 請求該學期所有課程列表...')
+
+    # 以 Beautiful Soup 解析 HTML 程式碼
+    soup = BeautifulSoup(
+        post('https://aps.ntut.edu.tw/course/tw/QueryCourse.jsp', payload), 'lxml')("tr")
+    # remove useless data
+    try:
+        soup.pop(0)
+        soup.pop()
+        soup.pop()
+        soup.pop()
+    except:
+        pass
+    print(f'[fetch] 開始擷取 {len(soup)} 堂課')
+
+    tasksPool = []
+    for i in soup:
+        tasksPool.append(courseWorker(i, year, sem))
+    await asyncio.gather(*tasksPool)
+    with open(f'./dist/{year}/{sem}/all.json', 'w') as outfile:
+        json.dump(table_data, outfile)
+
+
 async def fetchCourse(year=109, sem=2, keyword=''):
     try:
         os.makedirs(f'./dist/{year}/{sem}/course')
     except:
         pass
+    await fetchAllCourse(year, sem, keyword)
     departmentData = await fetchDepartment()
     for key in departmentData:
         payload = {
@@ -131,22 +190,20 @@ async def fetchCourse(year=109, sem=2, keyword=''):
             'sem': sem,
             'unit': '**',
             'cname':  keyword.encode('cp950'),
+            'search':  keyword.encode('cp950'),
             'ccode': '',
             'tname': '',
             'PN': 'ON',
         }
         for i in range(6+1):
             payload['D'+str(i)] = 'ON'
-        for i in range(6+13):
+        for i in range(13+1):
             payload['P'+str(i)] = 'ON'
 
         print(f'[fetch] 請求課程列表：{key}')
-        result = requests.post(
-            'https://aps.ntut.edu.tw/course/tw/QueryCourse.jsp', data=payload)
-        result.encoding = 'big5-hkscs'
-        # 以 Beautiful Soup 解析 HTML 程式碼
-        soup = BeautifulSoup(result.text, 'lxml')("tr")
-        # remove useless data
+
+        soup = BeautifulSoup(
+            post('https://aps.ntut.edu.tw/course/tw/QueryCourse.jsp', payload), 'lxml')("tr")
         try:
             soup.pop(0)
             soup.pop()
@@ -154,16 +211,16 @@ async def fetchCourse(year=109, sem=2, keyword=''):
             soup.pop()
         except:
             pass
-        print(f'[fetch] 開始擷取 {len(soup)} 堂課')
 
-        tasksPool = []
-        for i in soup:
-            tasksPool.append(courseWorker(i, year, sem))
-        await asyncio.gather(*tasksPool)
+        result_json_data = []
+        courseIds = [s.text.replace('\n', '') for s in soup]
+        for course in table_data:
+            if course['id'] in courseIds:
+                result_json_data.append(course)
 
         filename = 'main' if key == '日間部四技' else key
         with open(f'./dist/{year}/{sem}/{filename}.json', 'w') as outfile:
-            json.dump(table_data, outfile)
+            json.dump(result_json_data, outfile)
     print('All done!')
 
 
