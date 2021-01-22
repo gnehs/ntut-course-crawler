@@ -6,7 +6,7 @@ from fake_useragent import UserAgent
 
 
 async def fetch(url, i=0):
-    sem = asyncio.Semaphore(100)
+    sem = asyncio.Semaphore(10)
     headers = {
         'User-Agent': UserAgent().random
     }
