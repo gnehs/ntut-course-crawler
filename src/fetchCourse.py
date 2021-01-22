@@ -180,9 +180,7 @@ async def fetchCourse(year=109, sem=2, keyword=''):
         os.makedirs(f'./dist/{year}/{sem}/course')
     except:
         pass
-    # await fetchAllCourse(year, sem, keyword)
-    with open(f'./dist/{year}/{sem}/all.json') as f:
-        table_data = json.load(f)
+    await fetchAllCourse(year, sem, keyword)
     departmentData = await fetchDepartment()
     for key in departmentData:
         payload = {
