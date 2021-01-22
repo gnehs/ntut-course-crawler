@@ -4,6 +4,7 @@ import os
 import json
 import re
 import requests
+import random
 from os import path
 
 if __name__ == '__main__':
@@ -50,6 +51,7 @@ async def fetchSyllabus(url='ShowSyllabus.jsp?snum=281841&code=11189'):
 
 
 async def courseWorker(row, year, sem):
+    await asyncio.sleep(random.randint(1, 10))
     try:
         def parseLinks(d):
             res = []
