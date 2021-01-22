@@ -147,10 +147,13 @@ async def fetchCourse(year=109, sem=2, keyword=''):
         # 以 Beautiful Soup 解析 HTML 程式碼
         soup = BeautifulSoup(result.text, 'lxml')("tr")
         # remove useless data
-        soup.pop(0)
-        soup.pop()
-        soup.pop()
-        soup.pop()
+        try:
+            soup.pop(0)
+            soup.pop()
+            soup.pop()
+            soup.pop()
+        except:
+            pass
         print(f'[fetch] 開始擷取 {len(soup)} 堂課')
 
         tasksPool = []
