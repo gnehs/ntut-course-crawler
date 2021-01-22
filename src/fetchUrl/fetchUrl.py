@@ -25,7 +25,7 @@ async def fetch(url, i=0):
 
 
 async def main():
-    print(await fetch('https://aps.ntut.edu.tw/course/tw/'))
+    print(await fetch('https://ntut-course.gnehs.workers.dev/course/tw/'))
 
 if __name__ == '__main__':
     asyncio.run(main())

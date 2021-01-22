@@ -54,7 +54,7 @@ async def fetchSyllabus(url='ShowSyllabus.jsp?snum=281841&code=11189'):
 def post(url, payload, i=0):
     try:
         result = requests.post(
-            'https://aps.ntut.edu.tw/course/tw/QueryCourse.jsp', data=payload)
+            'https://ntut-course.gnehs.workers.dev/course/tw/QueryCourse.jsp', data=payload)
         result.encoding = 'big5-hkscs'
         return result.text
     except:
@@ -156,7 +156,7 @@ async def fetchAllCourse(year=109, sem=2, keyword=''):
 
     # 以 Beautiful Soup 解析 HTML 程式碼
     soup = BeautifulSoup(
-        post('https://aps.ntut.edu.tw/course/tw/QueryCourse.jsp', payload), 'lxml')("tr")
+        post('https://ntut-course.gnehs.workers.dev/course/tw/QueryCourse.jsp', payload), 'lxml')("tr")
     # remove useless data
     try:
         soup.pop(0)
@@ -180,7 +180,9 @@ async def fetchCourse(year=109, sem=2, keyword=''):
         os.makedirs(f'./dist/{year}/{sem}/course')
     except:
         pass
-    await fetchAllCourse(year, sem, keyword)
+    # await fetchAllCourse(year, sem, keyword)
+    with open(f'./dist/{year}/{sem}/all.json') as f:
+        table_data = json.load(f)
     departmentData = await fetchDepartment()
     for key in departmentData:
         payload = {
@@ -203,7 +205,7 @@ async def fetchCourse(year=109, sem=2, keyword=''):
         print(f'[fetch] 請求課程列表：{key}')
 
         soup = BeautifulSoup(
-            post('https://aps.ntut.edu.tw/course/tw/QueryCourse.jsp', payload), 'lxml')("tr")
+            post('https://ntut-course.gnehs.workers.dev/course/tw/QueryCourse.jsp', payload), 'lxml')("tr")
         try:
             soup.pop(0)
             soup.pop()
@@ -213,7 +215,7 @@ async def fetchCourse(year=109, sem=2, keyword=''):
             pass
 
         result_json_data = []
-        courseIds = [s.text.replace('\n', '') for s in soup]
+        courseIds = [s('td')[0].text.replace('\n', '') for s in soup]
         for course in table_data:
             if course['id'] in courseIds:
                 result_json_data.append(course)
