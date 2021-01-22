@@ -40,8 +40,10 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-    - name: Fetch data (${{ matrix.years }})
-      run: python runYear.py ${{ matrix.years }}
+    - name: Fetch data (${{ matrix.years }}) Sem:1
+      run: python runYear.py ${{ matrix.years }} 1
+    - name: Fetch data (${{ matrix.years }}) Sem:2
+      run: python runYear.py ${{ matrix.years }} 2
     - uses: actions/upload-artifact@v2
       with:
         name: ${{ matrix.years }}
