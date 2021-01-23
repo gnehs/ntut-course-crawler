@@ -6,6 +6,7 @@ yearFolders = [f for f in listdir(distPath) if isdir(join(distPath, f))]
 try:
     yearFolders.remove(".git")
 except:
+    print('meow')
     pass
 yearFolders.sort()
 result = {}
