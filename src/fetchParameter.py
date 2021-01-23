@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 
 
 async def fetchCurrentYearSem():
-    res = await fetch('https://ntut-course.gnehs.workers.dev/course/tw/QueryCurrPage.jsp')
+    res = await fetch('https://aps.ntut.edu.tw/course/tw/QueryCurrPage.jsp')
     soup = BeautifulSoup(res, 'lxml')
     yr = int(soup.find("select", {"name": "year"}).find(
         "option", {"selected": ""}).text)
@@ -19,7 +19,7 @@ async def fetchCurrentYearSem():
 
 async def fetchDepartment():
     """ 
-    res = await fetch('https://ntut-course.gnehs.workers.dev/course/tw/QueryCurrPage.jsp')
+    res = await fetch('https://aps.ntut.edu.tw/course/tw/QueryCurrPage.jsp')
     soup = BeautifulSoup(res, 'lxml')
     yr = soup.find("select", {"name": "matric"})('option')
     res = {}
@@ -32,7 +32,7 @@ async def fetchDepartment():
 
 
 async def fetchAllYear():
-    res = await fetch('https://ntut-course.gnehs.workers.dev/course/tw/QueryCurrPage.jsp')
+    res = await fetch('https://aps.ntut.edu.tw/course/tw/QueryCurrPage.jsp')
     soup = BeautifulSoup(res, 'lxml')
     yr = soup.find("select", {"name": "year"})('option')
     res = {'years': []}

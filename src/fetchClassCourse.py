@@ -12,7 +12,7 @@ import random
 
 
 async def fetchClass(url):
-    url = 'https://ntut-course.gnehs.workers.dev/course/tw/'+url
+    url = 'https://aps.ntut.edu.tw/course/tw/'+url
     departmentData = await fetch(url)
     soup = BeautifulSoup(departmentData, 'lxml')
     r = []
@@ -43,7 +43,7 @@ async def fetchDepartmentData(year=109, sem=2):
         pass
     print(f'[fetch] 正在取得系所列表...')
     url = f'Subj.jsp?format=-2&year={year}&sem={sem}'
-    url = 'https://ntut-course.gnehs.workers.dev/course/tw/'+url
+    url = 'https://aps.ntut.edu.tw/course/tw/'+url
     departmentsData = await fetch(url)
 
     soup = BeautifulSoup(departmentsData, 'lxml')

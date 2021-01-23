@@ -131,7 +131,7 @@ async def fetchCourse(year=109, sem=2):
         payload = {
             'stime': '0',
             'year': year,
-            'matric': '7',
+            'matric': departmentData[key],
             'sem': sem,
             'unit': '**',
             'cname':  '',
@@ -144,7 +144,7 @@ async def fetchCourse(year=109, sem=2):
         for i in range(13+1):
             payload['P'+str(i)] = 'ON'
         result = requests.post(
-            'https://ntut-course.gnehs.workers.dev/course/tw/QueryCourse.jsp', data=payload)
+            'https://aps.ntut.edu.tw/course/tw/QueryCourse.jsp', data=payload)
         result.encoding = 'big5-hkscs'
         soup = BeautifulSoup(result.text, 'lxml')("tr")
         try:
