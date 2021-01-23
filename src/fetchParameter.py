@@ -28,7 +28,7 @@ async def fetchDepartment():
     res.pop('全校')
     return res 
     """
-    return {'日間部四技': "'7'", '進修部四技': "'F'"}
+    return {'日間部四技': "'7'", '日間部研究所(碩、博)': "'8','9'", '進修部四技': "'F'"}
 
 
 async def fetchAllYear():
