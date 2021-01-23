@@ -131,7 +131,7 @@ async def fetchAllCourse(year=109, sem=2, keyword=''):
     payload = {
         'stime': '0',
         'year': year,
-        'matric': "'0','1','4','5','6','7','8','9','A','C','D','E','F'",
+        'matric': "'7','F'",
         'sem': sem,
         'unit': '**',
         'cname': keyword.encode('cp950'),
