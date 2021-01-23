@@ -14,4 +14,4 @@ for year in yearFolders:
         distPath, year)) if isdir(join(distPath, year, f))]
 
 with open(f'./dist/main.json', 'w') as outfile:
-    json.dump(result, outfile)
+    json.dump(result, outfile, ensure_ascii=False)

@@ -18,6 +18,7 @@ async def fetchCurrentYearSem():
 
 
 async def fetchDepartment():
+    """ 
     res = await fetch('https://ntut-course.gnehs.workers.dev/course/tw/QueryCurrPage.jsp')
     soup = BeautifulSoup(res, 'lxml')
     yr = soup.find("select", {"name": "matric"})('option')
@@ -25,7 +26,9 @@ async def fetchDepartment():
     for item in yr:
         res[item.text] = item.get('value')
     res.pop('全校')
-    return res
+    return res 
+    """
+    return {'日間部四技': "'7'", '進修部四技': "'F'"}
 
 
 async def fetchAllYear():
@@ -42,4 +45,5 @@ async def fetchAllYear():
 if __name__ == '__main__':
     async def main():
         await fetchAllYear()
+        print(await fetchDepartment())
     asyncio.run(main())

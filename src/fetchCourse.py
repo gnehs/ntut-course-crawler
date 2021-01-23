@@ -51,19 +51,11 @@ async def fetchSyllabus(url='ShowSyllabus.jsp?snum=281841&code=11189'):
             r'使用外文原文書：(.)', soup[6]('td')[0].text)[0] == '是')
 
 
-def post(url, payload, i=0):
-    try:
-        result = requests.post(
-            'https://ntut-course.gnehs.workers.dev/course/tw/QueryCourse.jsp', data=payload)
-        result.encoding = 'big5-hkscs'
-        return result.text
-    except:
-        print(f'[retry post][{i}] {url}')
-        time.sleep(5)
-        if i < 3:
-            return post(url, payload, i+1)
-        else:
-            print(f'[post failed] {url}')
+def post(url, payload):
+    result = requests.post(
+        'https://ntut-course.gnehs.workers.dev/course/tw/QueryCourse.jsp', data=payload)
+    result.encoding = 'big5-hkscs'
+    return result.text
 
 
 async def courseWorker(row, year, sem):
@@ -95,7 +87,7 @@ async def courseWorker(row, year, sem):
                 for i in d:
                     syllabusData.append(await fetchSyllabus(i.get('href')))
                 with open(filepath, 'w') as outfile:
-                    json.dump(syllabusData, outfile)
+                    json.dump(syllabusData, outfile, ensure_ascii=False)
 
         await parseSyllabus(rowData[20]('a'))
         table_data.append({
@@ -172,7 +164,7 @@ async def fetchAllCourse(year=109, sem=2, keyword=''):
         tasksPool.append(courseWorker(i, year, sem))
     await asyncio.gather(*tasksPool)
     with open(f'./dist/{year}/{sem}/all.json', 'w') as outfile:
-        json.dump(table_data, outfile)
+        json.dump(table_data, outfile, ensure_ascii=False)
 
 
 async def fetchCourse(year=109, sem=2, keyword=''):
@@ -220,7 +212,7 @@ async def fetchCourse(year=109, sem=2, keyword=''):
 
         filename = 'main' if key == '日間部四技' else key
         with open(f'./dist/{year}/{sem}/{filename}.json', 'w') as outfile:
-            json.dump(result_json_data, outfile)
+            json.dump(result_json_data, outfile, ensure_ascii=False)
     print('All done!')
 
 

@@ -53,7 +53,7 @@ async def fetchDepartmentData(year=109, sem=2):
     await asyncio.gather(*tasksList)
 
     with open(f'./dist/{year}/{sem}/department.json', 'w') as outfile:
-        json.dump(res, outfile)
+        json.dump(res, outfile, ensure_ascii=False)
 
 
 if __name__ == '__main__':
