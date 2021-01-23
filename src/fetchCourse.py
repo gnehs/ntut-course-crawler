@@ -161,8 +161,9 @@ async def fetchCourse(year=109, sem=2):
         await asyncio.gather(*tasksPool)
 
         filename = 'main' if key == '日間部四技' else key
-        with open(f'./dist/{year}/{sem}/{filename}.json', 'w') as outfile:
-            json.dump(table_data, outfile, ensure_ascii=False)
+        if len(table_data) > 0:
+            with open(f'./dist/{year}/{sem}/{filename}.json', 'w') as outfile:
+                json.dump(table_data, outfile, ensure_ascii=False)
     print('All done!')
 
 
