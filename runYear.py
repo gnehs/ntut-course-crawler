@@ -5,8 +5,8 @@ import sys
 
 
 async def main():
-    yr = int(sys.argv[1])
-    sem = int(sys.argv[2])
+    yr = sys.argv[1]
+    sem = sys.argv[2]
     print(f'[fetch] Year:{yr} Sem:{sem}')
     await fetchDepartmentData(yr, sem)
     await fetchCourse(yr, sem)
