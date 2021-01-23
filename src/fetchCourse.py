@@ -51,13 +51,6 @@ async def fetchSyllabus(url='ShowSyllabus.jsp?snum=281841&code=11189'):
             r'使用外文原文書：(.)', soup[6]('td')[0].text)[0] == '是')
 
 
-def post(url, payload):
-    result = requests.post(
-        'https://ntut-course.gnehs.workers.dev/course/tw/QueryCourse.jsp', data=payload)
-    result.encoding = 'big5-hkscs'
-    return result.text
-
-
 async def courseWorker(row, year, sem):
     await asyncio.sleep(random.randint(1, 60*5))
     try:
@@ -127,7 +120,7 @@ async def courseWorker(row, year, sem):
         pass
 
 
-async def fetchCourse(year=109, sem=2, keyword=''):
+async def fetchCourse(year=109, sem=2):
     try:
         os.makedirs(f'./dist/{year}/{sem}/course')
     except:
@@ -138,11 +131,10 @@ async def fetchCourse(year=109, sem=2, keyword=''):
         payload = {
             'stime': '0',
             'year': year,
-            'matric': departmentData[key],
+            'matric': '7',
             'sem': sem,
             'unit': '**',
-            'cname':  keyword.encode('cp950'),
-            'search':  keyword.encode('cp950'),
+            'cname':  '',
             'ccode': '',
             'tname': '',
             'PN': 'ON',
@@ -151,9 +143,10 @@ async def fetchCourse(year=109, sem=2, keyword=''):
             payload['D'+str(i)] = 'ON'
         for i in range(13+1):
             payload['P'+str(i)] = 'ON'
-
-        soup = BeautifulSoup(
-            post('https://ntut-course.gnehs.workers.dev/course/tw/QueryCourse.jsp', payload), 'lxml')("tr")
+        result = requests.post(
+            'https://ntut-course.gnehs.workers.dev/course/tw/QueryCourse.jsp', data=payload)
+        result.encoding = 'big5-hkscs'
+        soup = BeautifulSoup(result.text, 'lxml')("tr")
         try:
             soup.pop(0)
             soup.pop()
