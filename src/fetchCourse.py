@@ -127,54 +127,14 @@ async def courseWorker(row, year, sem):
         pass
 
 
-async def fetchAllCourse(year=109, sem=2, keyword=''):
-    payload = {
-        'stime': '0',
-        'year': year,
-        'matric': "'7','8','9','F'",
-        'sem': sem,
-        'unit': '**',
-        'cname': keyword.encode('cp950'),
-        'ccode': '',
-        'tname': '',
-        'PN': 'ON',
-    }
-    for i in range(6+1):
-        payload['D'+str(i)] = 'ON'
-    for i in range(13+1):
-        payload['P'+str(i)] = 'ON'
-
-    print(f'[fetch] 請求該學期所有課程列表...')
-
-    # 以 Beautiful Soup 解析 HTML 程式碼
-    soup = BeautifulSoup(
-        post('https://ntut-course.gnehs.workers.dev/course/tw/QueryCourse.jsp', payload), 'lxml')("tr")
-    # remove useless data
-    try:
-        soup.pop(0)
-        soup.pop()
-        soup.pop()
-        soup.pop()
-    except:
-        pass
-    print(f'[fetch] 開始擷取 {len(soup)} 堂課')
-
-    tasksPool = []
-    for i in soup:
-        tasksPool.append(courseWorker(i, year, sem))
-    await asyncio.gather(*tasksPool)
-    with open(f'./dist/{year}/{sem}/all.json', 'w') as outfile:
-        json.dump(table_data, outfile, ensure_ascii=False)
-
-
 async def fetchCourse(year=109, sem=2, keyword=''):
     try:
         os.makedirs(f'./dist/{year}/{sem}/course')
     except:
         pass
-    await fetchAllCourse(year, sem, keyword)
     departmentData = await fetchDepartment()
     for key in departmentData:
+        table_data = []  # reset
         payload = {
             'stime': '0',
             'year': year,
@@ -192,8 +152,6 @@ async def fetchCourse(year=109, sem=2, keyword=''):
         for i in range(13+1):
             payload['P'+str(i)] = 'ON'
 
-        print(f'[fetch] 請求課程列表：{key}')
-
         soup = BeautifulSoup(
             post('https://ntut-course.gnehs.workers.dev/course/tw/QueryCourse.jsp', payload), 'lxml')("tr")
         try:
@@ -203,16 +161,15 @@ async def fetchCourse(year=109, sem=2, keyword=''):
             soup.pop()
         except:
             pass
-
-        result_json_data = []
-        courseIds = [s('td')[0].text.replace('\n', '') for s in soup]
-        for course in table_data:
-            if course['id'] in courseIds:
-                result_json_data.append(course)
+        print(f'[fetch] 開始擷取 {key} - {len(soup)} 堂課')
+        tasksPool = []
+        for i in soup:
+            tasksPool.append(courseWorker(i, year, sem))
+        await asyncio.gather(*tasksPool)
 
         filename = 'main' if key == '日間部四技' else key
         with open(f'./dist/{year}/{sem}/{filename}.json', 'w') as outfile:
-            json.dump(result_json_data, outfile, ensure_ascii=False)
+            json.dump(table_data, outfile, ensure_ascii=False)
     print('All done!')
 
 
