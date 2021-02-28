@@ -5,4 +5,4 @@
 https://github.com/gnehs/ntut-course-crawler-node
 
 ## 如何使用
-請查看 `[.github/workflows](https://github.com/gnehs/ntut-course-crawler/tree/%E8%B9%A6%E8%B9%A6/.github/workflows)`
+請查看 [`.github/workflows`](https://github.com/gnehs/ntut-course-crawler/tree/%E8%B9%A6%E8%B9%A6/.github/workflows)
